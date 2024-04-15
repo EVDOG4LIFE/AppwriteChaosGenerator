@@ -1,0 +1,28 @@
+# Use the official Node.js 18 image as a parent image
+FROM node:18
+
+# Install Python 3 and pip
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    apt install python3.11-venv -y
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . .
+
+# Install any needed packages specified in package.json
+RUN npm install
+
+# Create a virtual environment and install Python dependencies
+RUN python3 -m venv /app/venv && \
+    . /app/venv/bin/activate && \
+    pip3 install appwrite && \
+    pip3 install faker
+
+# Build your Next.js app
+RUN npm run build
+
+# Set the virtual environment to activate on start
+CMD . /app/venv/bin/activate && npm start
